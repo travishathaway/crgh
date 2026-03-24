@@ -11,6 +11,8 @@ version = "0.1.0"
 perceval = "*"
 click = "*"
 requests = "*"
+pandas = ">=3.0.1,<4"
+plotly = ">=6.6.0,<7"
 
 [pypi-dependencies]
 crgh = { path = ".", editable = true }

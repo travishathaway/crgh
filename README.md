@@ -1,7 +1,6 @@
 # CHAOSS Report for GitHub Organizations
 
-This is a tool to generate reports based on CHAOSS metrics models for organizations in GitHub.
-
+This is a tool to generate reports based on CHAOSS metrics models for organizations in GitHub. It's basically just a wrapper around [perceval](https://github.com/chaoss/grimoirelab-perceval) with added functionality to generate reports based on CHAOSS metrics models.
 
 ## Usage
 
@@ -32,7 +31,7 @@ This will return all public repositories that are not "public archives" and will
 }
 ```
 
-You can save this as a file then feed it to the `gather-stats` command to grab all the information about issues and pull requests for a repository.
+You can save this as a file and then feed it to the `gather-stats` command to grab all the information about issues and pull requests for a repository.
 
 ```
 crgh gather-stats <repo-info-file> --output-dir <org-name> --since 2025-01-01 --token $GITHUB_TOKEN

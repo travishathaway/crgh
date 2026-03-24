@@ -68,16 +68,16 @@ def gather_stats(repo_info_file: str, output_dir: str, since: str, token: str):
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
-    archive_path = out_path / ".cache.sqlite"
-
-    if not archive_path.exists():
-        archive = Archive.create(archive_path)
-    else:
-        archive = Archive(archive_path)
-
     for repo in repo_info.get("repositories", []):
         name = repo["name"]
         click.echo(f"Fetching {org}/{name} since {since} ...", err=True)
+
+        archive_path = out_path / f".{name}-cache.sqlite"
+
+        if not archive_path.exists():
+            archive = Archive.create(archive_path)
+        else:
+            archive = Archive(archive_path)
 
         issues = []
         pull_requests = []
@@ -116,3 +116,48 @@ def gather_stats(repo_info_file: str, output_dir: str, since: str, token: str):
         )
 
     click.echo("Done.", err=True)
+
+
+@main.command("generate-report")
+@click.argument("data_dir", type=click.Path(exists=True, file_okay=False))
+@click.option("--output", default="report.html", show_default=True, help="Output HTML file.")
+@click.option("--since", default=None, help="Start of reporting period (YYYY-MM-DD). Defaults to earliest item.")
+@click.option("--until", default=None, help="End of reporting period (YYYY-MM-DD). Defaults to today.")
+def generate_report(data_dir: str, output: str, since: str | None, until: str | None):
+    """Generate a Community Activity HTML report from DATA_DIR."""
+    from crgh.report import build_report, load_org_items, week_range, _parse_iso
+
+    data_path = Path(data_dir)
+    output_path = Path(output)
+
+    until_dt = (
+        datetime.strptime(until, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        if until
+        else datetime.now(tz=timezone.utc)
+    )
+
+    if since:
+        try:
+            since_dt = datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        except ValueError:
+            click.echo("Error: --since must be in YYYY-MM-DD format.", err=True)
+            sys.exit(1)
+    else:
+        click.echo("No --since given, scanning data for earliest date ...", err=True)
+        issues, prs = load_org_items(data_path)
+        dates = []
+        for item in issues + prs:
+            created = (item.get("data") or {}).get("created_at")
+            if created:
+                try:
+                    dates.append(_parse_iso(created))
+                except ValueError:
+                    pass
+        if not dates:
+            click.echo("Error: no dated items found in data directory.", err=True)
+            sys.exit(1)
+        since_dt = min(dates)
+
+    click.echo(f"Generating report for {data_path.name} ({since_dt.date()} – {until_dt.date()}) ...", err=True)
+    build_report(data_path, output_path, since_dt, until_dt)
+    click.echo(f"Report written to {output_path}", err=True)
