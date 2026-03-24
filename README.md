@@ -30,6 +30,7 @@ This will return all public repositories that are not "public archives" and will
     }
   ]
 }
+```
 
 You can save this as a file then feed it to the `gather-stats` command to grab all the information about issues and pull requests for a repository.
 
