@@ -1,0 +1,16 @@
+[workspace]
+authors = ["Travis Hathaway <travis.j.hathaway@gmail.com>"]
+channels = ["file:///home/thath/opt/conda-local-channel/", "conda-forge"]
+name = "anaconda-chaoss-report"
+platforms = ["linux-64", "osx-arm64", "win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+perceval = "*"
+click = "*"
+requests = "*"
+
+[pypi-dependencies]
+crgh = { path = ".", editable = true }
