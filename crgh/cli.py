@@ -11,6 +11,10 @@ from perceval.backends.core.github import GitHub
 from perceval.archive import Archive
 
 from crgh.github_api import count_issues_and_prs, list_public_repos
+from crgh.patches import apply_perceval_archive_fix, apply_perceval_client_fetch_fix
+
+apply_perceval_archive_fix()
+apply_perceval_client_fetch_fix()
 
 
 @click.group()

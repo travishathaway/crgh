@@ -162,7 +162,7 @@ def metric_updated_issues_count(
     issues: list[dict], prs: list[dict], weeks: list[str]
 ) -> pd.Series:
     """Count of issues + PRs updated per week."""
-    counts: dict[str, int] = {w: 0 for w in weeks}
+    counts: dict[str | date, int] = {w: 0 for w in weeks}
 
     for item in issues + prs:
         updated_at = (item.get("data") or {}).get("updated_at")
